@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+venv/
+.venv/
+env/
+
+# Recorded video output & temp files
+detected/
+*.mp4
+*.avi
+
+# OS / Editor artifacts
+.DS_Store
+.idea/
+.vscode/

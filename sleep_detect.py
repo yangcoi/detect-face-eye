@@ -20,7 +20,10 @@ import tensorflow as tf
 from playsound import playsound
 import shutil
 
-import firebase
+try:
+    import firebase
+except ImportError:
+    firebase = None
 
 ### SET OUTPUT FILE NAME ###
 
@@ -164,6 +167,7 @@ while (True):
         now = time.asctime( time.localtime(time.time()))
         x = str(now).replace(" ", "_") 
         x = x.replace(":",".")
+        os.makedirs("./detected", exist_ok=True)
         f = "./detected/"+"detected_"+x+".mp4"
         f1 = "detected_"+x+".mp4"
         nofacetimeout = 0
