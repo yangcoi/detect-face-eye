@@ -1,6 +1,10 @@
 # Real-Time Driver Drowsiness Detection System
 
-A computer vision desktop application designed to detect driver drowsiness and closed-eye fatigue in real time using Dlib facial landmarks, MobileNet eye-state classification, and automated audio alarms.
+Real-time driver fatigue monitoring system built with OpenCV, Dlib facial landmarks, and automated alarm alerting.
+
+```
+Pipeline: OpenCV (Camera Feed) -> Dlib (68 Landmarks) -> EAR / Eye State Classifier -> Alert (Airhorn) & Incident Recording
+```
 
 ---
 
@@ -8,52 +12,50 @@ A computer vision desktop application designed to detect driver drowsiness and c
 
 **Current Status:** Working Computer Vision Prototype.
 
-This repository is a functional computer vision prototype created to evaluate real-time driver fatigue monitoring. It runs as a standalone Python desktop application connected to a local camera feed.
+This repository is a functional computer vision prototype developed for driver fatigue detection experiments. It runs locally as a standalone Python desktop application.
 
-### What is implemented:
-- Real-time face detection using HOG (Histogram of Oriented Gradients) via `face_recognition`.
-- 68-point facial landmark alignment using Dlib to extract eye regions.
-- MobileNet-based binary eye-state classification (open vs. closed) from cropped grayscale eye patches.
-- Consecutive frame closure counter: triggers an acoustic horn warning (`veryloudairhorn.mp3`) when closure exceeds the safety threshold.
-- Automatic incident video recording: captures and saves short MP4 clips of detected drowsiness events into `./detected/`.
+### Pipeline Implementation:
+1. **OpenCV:** Captures webcam frames at 30 FPS, normalizes lighting, and manages real-time video display.
+2. **Dlib (68 Facial Landmarks):** Detects facial boundaries via HOG and localizes 68 landmark points to isolate the left and right eye contours.
+3. **EAR & Eye State Classification:** Evaluates eye closure state using Eye Aspect Ratio (EAR) geometry and a MobileNet neural network classifier.
+4. **Alert & Incident Recording:** Tracks consecutive closed frames. When threshold is exceeded, it triggers an audible airhorn alert (`veryloudairhorn.mp3`) and automatically saves an incident video clip to `./detected/`.
 
-### Current limitations & Scope:
-- Desktop script: Designed for single-camera desktop/laptop environments without a web dashboard.
-- Model dependencies: Relies on pre-trained Dlib 68-landmark weights (`shape_predictor_68_face_landmarks.dat`) and a fine-tuned MobileNet model (`weights.149-0.01.hdf5`).
-- Environment sensitivity: Detection accuracy depends on lighting conditions and camera angle relative to the driver's face.
+### Current Limitations:
+- Single-camera desktop script: Designed for local webcam execution without cloud telemetry.
+- Environment sensitivity: Accuracy is affected by extreme low-light environments and oblique face angles.
 
 ---
 
-## 2. System Flow
+## 2. System Architecture
 
 ```
 +-------------------------------------------------------------+
-|                     WEBCAM VIDEO FEED                       |
-|  - Frame capture at 30 FPS                                  |
-|  - Downsampling & LAB color space conversion                |
+|                     1. OPENCV VIDEO INGEST                  |
+|  - Real-time webcam frame acquisition                       |
+|  - Grayscale & LAB color space preprocessing                |
 +-------------------------------------------------------------+
                                |
                                v
 +-------------------------------------------------------------+
-|               FACE DETECTION & LANDMARK EXTRACTION          |
-|  - HOG face bounding box detection                          |
-|  - Dlib 68 facial landmarks locator                         |
-|  - Left and right eye bounding box segmentation             |
+|                 2. DLIB 68 FACIAL LANDMARKS                 |
+|  - Face detection via HOG classifier                        |
+|  - 68-point landmark localization                           |
+|  - Left/Right eye boundary segmentation                     |
 +-------------------------------------------------------------+
                                |
                                v
 +-------------------------------------------------------------+
-|                 EYE STATE CLASSIFICATION                    |
-|  - Preprocess eye patches (20x10 grayscale / MobileNet)     |
-|  - Binary classification: Open vs Closed                    |
+|            3. EAR & EYE STATE CLASSIFICATION                |
+|  - Eye Aspect Ratio (EAR) contour calculation               |
+|  - MobileNet binary classifier (Open vs Closed)             |
 +-------------------------------------------------------------+
                                |
                                v
 +-------------------------------------------------------------+
-|                  FATIGUE LOGIC & RESPONSE                   |
-|  - Closed frame counter > Threshold                         |
-|  - Trigger audible horn alarm (playsound)                   |
-|  - Save incident video clip to ./detected/                  |
+|             4. THRESHOLD ALERT & INCIDENT RECORDING         |
+|  - Safety frame closure counter                             |
+|  - Real-time airhorn alarm trigger (playsound)              |
+|  - Automatic MP4 clip export to ./detected/                 |
 +-------------------------------------------------------------+
 ```
 
@@ -63,7 +65,7 @@ This repository is a functional computer vision prototype created to evaluate re
 
 - Language: Python 3.8+
 - Computer Vision: OpenCV, Dlib, face_recognition, imutils
-- Deep Learning: TensorFlow, Keras (MobileNet)
+- Machine Learning: TensorFlow, Keras (MobileNet)
 - Audio: playsound
 
 ---
@@ -72,22 +74,19 @@ This repository is a functional computer vision prototype created to evaluate re
 
 ### Prerequisites
 
-- Python 3.8 or 3.9 recommended
-- CMake and C++ build tools (required to compile `dlib`)
+- Python 3.8 or 3.9
+- CMake and C++ compiler (required for Dlib compilation)
 - Working webcam
 
 ### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/yangcoi/detect-face-eye.git
 cd detect-face-eye
 
-# Create and activate virtual environment
 python3 -m venv venv
 source venv/bin/activate
 
-# Install dependencies
 pip install -r requirements.txt
 ```
 
@@ -97,7 +96,7 @@ pip install -r requirements.txt
 python sleep_detect.py
 ```
 
-Press `q` in the OpenCV window to exit the application.
+Press `q` to terminate the application.
 
 ---
 
